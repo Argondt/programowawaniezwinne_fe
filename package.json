@@ -24,6 +24,8 @@
     "keycloak-react-web": "^0.1.19",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router": "^6.18.0",
+    "react-router-dom": "^6.18.0",
     "react-scripts": "5.0.1",
     "sockjs": "^0.3.24",
     "sockjs-client": "^1.6.1",
@@ -56,6 +58,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-router-dom": "^5.3.3",
     "@types/sockjs-client": "^1.5.3"
   },
   "extends": "../tsconfig.json",
