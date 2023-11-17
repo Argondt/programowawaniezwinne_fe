@@ -38,8 +38,15 @@ const getAllProjects = async (params: GetAllProjectsParams = {}) => {
   console.log(response);
   return response.data;
 };
+const createProject = async (nazwa: string, opis: string) => {
+  const response = await axios.post<Response>("/projekty",
+    { nazwa, opis }
+  );
+  return response.data;
+};
 
 export const chatService = {
   getAllMessages,
-  getAllProjects
+  getAllProjects,
+  createProject
 };

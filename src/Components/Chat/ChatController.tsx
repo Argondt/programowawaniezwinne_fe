@@ -7,7 +7,8 @@ import Button from "@mui/material/Button";
 import SockJS from "sockjs-client";
 import Typography from "@mui/material/Typography";
 import { ChatMessage } from "../Interface/ChatMessage";
-export const ChatController = () => {
+type Props = {};
+export const ChatController = (props: Props) => {
   const [stompClient, setStompClient] = useState<CompatClient | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState("");

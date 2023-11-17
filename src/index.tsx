@@ -4,7 +4,8 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import AuthenticationProvider from "./Providers/AuthenticationProvider";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, RouterProvider } from "react-router-dom";
+import { router } from "./Components/Routes";
 
 // window.fetch = fetchInterceptor;
 
@@ -13,11 +14,10 @@ const root = createRoot(container);
 
 root.render(
   <AuthenticationProvider>
-    <BrowserRouter>
-      <StrictMode>
-        <App />
-      </StrictMode>
-    </BrowserRouter>
+    <StrictMode>
+      <RouterProvider router={router} />
+    
+    </StrictMode>
   </AuthenticationProvider>
 );
 
