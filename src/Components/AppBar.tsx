@@ -5,6 +5,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
 import ChatIcon from "@mui/icons-material/Chat";
 import FolderIcon from "@mui/icons-material/Folder";
+import PeopleIcon from "@mui/icons-material/People";
 
 export const AppBarMenu = () => {
   const { keycloak } = useKeycloak();
@@ -34,6 +35,15 @@ export const AppBarMenu = () => {
           to="/" 
         >
           Projekty
+        </Button>
+        <Button
+            variant="outlined"
+            component={Link}
+            startIcon={<PeopleIcon />}
+            style={{ marginLeft: "10px" }}
+            to="/users" // Ścieżka do UserList
+        >
+          Użytkownicy
         </Button>
         <Button
           variant="outlined"

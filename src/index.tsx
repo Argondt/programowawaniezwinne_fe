@@ -1,24 +1,26 @@
-import React, { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import React, {StrictMode} from "react";
+import {createRoot} from "react-dom/client";
 import "./index.css";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import AuthenticationProvider from "./Providers/AuthenticationProvider";
-import { BrowserRouter, RouterProvider } from "react-router-dom";
-import { router } from "./Components/Routes";
+import {RouterProvider} from "react-router-dom";
+import {router} from "./Components/Routes";
+import {QueryClient, QueryClientProvider} from 'react-query'
 
 // window.fetch = fetchInterceptor;
 
 const container = document.getElementById("root") as HTMLElement;
 const root = createRoot(container);
+const queryClient = new QueryClient();
 
 root.render(
-  <AuthenticationProvider>
-    <StrictMode>
-      <RouterProvider router={router} />
-    
-    </StrictMode>
-  </AuthenticationProvider>
+    <AuthenticationProvider>
+        <StrictMode>
+            <QueryClientProvider client={queryClient}>
+                <RouterProvider router={router}/>
+            </QueryClientProvider>
+        </StrictMode>
+    </AuthenticationProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
