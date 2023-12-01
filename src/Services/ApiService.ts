@@ -51,23 +51,34 @@ const uploadFiles = async (formData: any, projektId: any) => {
     });
     return response.data;
 };
-const getProjectFiles = async (projektId: any) => {
-    const response = await api.get(`/projekty/${projektId}/files`);
+const getProjectFiles = async (id: any) => {
+    const response = await api.get(`/projekty/${id}/files`);
     return response.data;
 };
-const downloadFile = async (projektId: any, filename: any) => {
-    const response = await api.get(`/projekty/${projektId}/files/${filename}/download`);
+const downloadFile = async (id: any, filename: any) => {
+    const response = await api.get(`/projekty/${id}/files/${filename}/download`);
     return response.data.url; // URL do pobrania pliku
 };
 const getUsers = async () => {
     const response = await api.get('/users'); // URL do twojego backendowego endpointu
     return response.data;
 };
-export const chatService = {
+const createTask = async (taskData: any) => {
+    const response = await api.post('/zadania', taskData); // URL do twojego backendowego endpointu tworzenia zadania
+    return response.data;
+};
+const getProjectTask = async (id: any) => {
+    const response = await api.get(`/zadania/projekt/${id}/zadania`); // URL do twojego backendowego endpointu tworzenia zadania
+    return response.data;
+};
+export const apiService = {
     getAllMessages,
     getAllProjects,
     createProject,
     uploadFiles,
-    getProjectFiles, downloadFile
-    , getUsers
+    getProjectFiles,
+    downloadFile,
+    getUsers,
+    createTask,
+    getProjectTask
 };

@@ -1,13 +1,13 @@
 import React from 'react';
 import { useQuery } from 'react-query';
-import { chatService } from '../Services/chatService';
+import { apiService } from '../Services/ApiService';
 type Props = {};
 interface User {
     id: string;
     username: string;
 }
 const UserList: React.FC = (props: Props) => {
-    const { data: users, isLoading, isError, error } = useQuery<User[], Error>('users', () => chatService.getUsers());
+    const { data: users, isLoading, isError, error } = useQuery<User[], Error>('users', () => apiService.getUsers());
 
     if (isLoading) {
         return <div>Ładowanie...</div>;

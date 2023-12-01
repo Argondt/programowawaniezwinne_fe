@@ -3,7 +3,7 @@ import React, {FormEvent, useState} from "react";
 import { TextField, Button, Drawer } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useMutation, useQueryClient } from 'react-query';
-import { chatService } from "../Services/chatService";
+import { apiService } from "../Services/ApiService";
 
 const ProjektForm = () => {
   const [nazwa, setNazwa] = useState("");
@@ -13,7 +13,7 @@ const ProjektForm = () => {
 
   const mutation = useMutation(
       () => {
-          return chatService.createProject(nazwa, opis);
+          return apiService.createProject(nazwa, opis);
       },
       {
         onSuccess: () => {

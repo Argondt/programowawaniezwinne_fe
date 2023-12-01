@@ -2,13 +2,13 @@
 import React from "react";
 import {Box, CircularProgress, Container, Grid, Paper, Typography} from "@mui/material";
 import {useQuery} from 'react-query';
-import {chatService} from "../Services/chatService";
+import {apiService} from "../Services/ApiService";
 import ProjektForm from "./ProjektAdd";
 import {useNavigate} from "react-router";
 
 const Dashboard = () => {
     const {data: projekty, isLoading, error} = useQuery('projekty', () =>
-        chatService.getAllProjects({page: 0, size: 10})
+        apiService.getAllProjects({page: 0, size: 10})
     );
     const navigate = useNavigate();
     if (isLoading) return <div><CircularProgress size={120} /></div>;
@@ -25,21 +25,21 @@ const Dashboard = () => {
             <Box style={{padding: "20px"}}>
                 <Grid container spacing={3}>
                     {projekty?.content.map((projekt) => (
-                        <Grid item xs={12} sm={6} md={4} key={projekt.projektId}>
+                        <Grid item xs={12} sm={6} md={4} key={projekt.id}>
                             <Paper elevation={3} style={{padding: "20px", textAlign: "center"}}
-                                   onClick={() => handleProjectClick(projekt.projektId)} // Navigate to project details on click
+                                   onClick={() => handleProjectClick(projekt.id)} // Navigate to project details on click
                             >
                                 <Typography variant="h6" style={{marginBottom: "10px"}}>
-                                    {projekt.nazwa}
+                                    {projekt.name}
                                 </Typography>
                                 <Typography variant="body2" style={{marginBottom: "10px"}}>
-                                    {projekt.opis}
+                                    {projekt.description}
                                 </Typography>
                                 <Typography variant="caption" style={{display: "block", marginBottom: "5px"}}>
-                                    {projekt.dataCzasUtworzeniaDateTime}
+                                    {projekt.startDate}
                                 </Typography>
                                 <Typography variant="caption">
-                                    {projekt.dataCzasModyfikacji}
+                                    {projekt.modificationTime}
                                 </Typography>
                             </Paper>
                         </Grid>

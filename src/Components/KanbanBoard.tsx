@@ -1,10 +1,12 @@
-import React from 'react';
-import { useQuery, useMutation } from 'react-query';
-import { Grid, Paper, Typography, Box, Button, Drawer, Container } from "@mui/material";
+import React, {useEffect, useState} from 'react';
+import {useQuery, useMutation, useQueryClient} from 'react-query';
+import {Grid, Paper, Typography, Box, Button, Drawer, Container, CircularProgress} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useParams } from "react-router-dom";
-import { chatService } from '../Services/chatService';
+import { apiService } from '../Services/ApiService';
+import { DragDropContext, Droppable, Draggable, DroppableProvided, DraggableProvided } from 'react-beautiful-dnd';
+import CreateTaskDrawerForm from './CreateTaskForm';
 
 // Definicja interfejsu dla plików projektu
 interface ProjectFile {
@@ -12,24 +14,48 @@ interface ProjectFile {
     fileName: string;
     url: string;
 }
-
+interface ProjectTask {
+    id: string;
+    name: string;
+    status: string;
+}
 const KanbanBoard = () => {
-    const { id: projektId } = useParams();
+    const { id: id } = useParams();
     const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [drawerOpen1, setDrawerOpen1] = React.useState(false);
     const [selectedFiles, setSelectedFiles] = React.useState<FileList | null>(null);
-
+    const queryClient = useQueryClient();
+    const [columns, setColumns] = useState<{ [key: string]: ProjectTask[] }>({});
     // UseQuery do pobrania plików projektu
     const { data: plikiProjektu, isLoading, isError } = useQuery<ProjectFile[], Error>(
-        ['plikiProjektu', projektId],
-        () => chatService.getProjectFiles(projektId)
+        ['plikiProjektu', id],
+        () => apiService.getProjectFiles(id)
     );
 
+    const { data: projectTasks, isLoading: isLoadingTasks, isError: isErrorTasks } = useQuery<ProjectTask[], Error>(
+        ['projectTasks', id],
+        () => apiService.getProjectTask(id)
+    );
+
+    useEffect(() => {
+        console.log(projectTasks)
+        if (projectTasks) {
+            const groupedTasks = projectTasks.reduce((acc: { [x: string]: any; }, task: { status: string; }) => {
+                const status = task.status || 'no_status';
+                acc[status] = [...(acc[status] || []), task];
+                return acc;
+            }, {});
+            setColumns(groupedTasks);
+        }
+    }, [projectTasks]);
     // UseMutation dla przesyłania plików
     const uploadMutation = useMutation(
-        (formData: FormData) => chatService.uploadFiles(formData, projektId),
+        (formData: FormData) => apiService.uploadFiles(formData, id),
         {
             onSuccess: () => {
                 // Odświeżanie danych po udanym przesłaniu pliku
+                queryClient.invalidateQueries(['plikiProjektu', id]);
+                setDrawerOpen(false)
             },
             onError: (error) => {
                 // Obsługa błędów
@@ -55,16 +81,16 @@ const KanbanBoard = () => {
 
         uploadMutation.mutate(formData);
     };
-    const columns = {
-        todo: {title: "To Do", tasks: ["Task 1", "Task 2"]},
-        inProgress: {title: "In Progress", tasks: ["Task 3"]},
-        done: {title: "Done", tasks: ["Task 4", "Task 5"]},
+    const handleTaskAdded = () => {
+        queryClient.invalidateQueries(['projectTasks', id]);
     };
     const handleDownload = async (filename: string) => {
-        const url = await chatService.downloadFile(projektId, filename);
+        const url = await apiService.downloadFile(id, filename);
         window.open(url, '_blank');
     };
 
+    if (isLoadingTasks) return <div><CircularProgress size={120} /></div>;
+    if (isErrorTasks) return <div>Error loading tasks</div>;
     const NoFilesMessage = () => (
         <Grid item xs={12}>
             <Paper elevation={3} style={{ padding: "20px", textAlign: "center" }}>
@@ -81,15 +107,19 @@ const KanbanBoard = () => {
         </Grid>
     );
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading) return <div><CircularProgress size={120} /></div>;
     if (isError) return <div>Error loading files</div>;
-
+    const onDragEnd = () => {
+        // Logika obsługi przeciągania i upuszczania
+    };
+    // @ts-ignore
     return (
         <Container>
             <Box style={{ padding: "20px", display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}>
                 <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setDrawerOpen(true)}>
-                    Add Files
+                    Dodaj Pliki
                 </Button>
+                <CreateTaskDrawerForm projectId={id} onTaskAdded={handleTaskAdded}/>
             </Box>
 
             <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
@@ -104,20 +134,36 @@ const KanbanBoard = () => {
                     <Button onClick={handleSubmit}>Upload</Button>
                 </Box>
             </Drawer>
-            <Grid container spacing={3}>
-                {Object.entries(columns).map(([columnId, column]) => (
-                    <Grid item xs={4} key={columnId}>
-                        <Paper elevation={3} sx={{minHeight: "300px", padding: "16px"}}>
-                            <Typography variant="h6">{column.title}</Typography>
-                            {column.tasks.map((task, index) => (
-                                <Paper key={index} elevation={1} sx={{margin: "8px 0", padding: "8px"}}>
-                                    {task}
-                                </Paper>
-                            ))}
-                        </Paper>
-                    </Grid>
+
+            <DragDropContext onDragEnd={onDragEnd}>
+                {Object.entries(columns).map(([status, tasks]) => (
+                    <Droppable droppableId={status} key={status}>
+                        {(provided: DroppableProvided) => (
+                            <div
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                            >
+                                <Typography variant="h6">{status}</Typography>
+                                {tasks.map((task: ProjectTask, index: number) => (
+                                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                                        {(provided: DraggableProvided) => (
+                                            <Paper
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                style={{ margin: "8px 0", padding: "8px" }}
+                                            >
+                                                {task.name}
+                                            </Paper>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
                 ))}
-            </Grid>
+            </DragDropContext>
             <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3}}>
                 <Typography variant="h5" sx={{padding: "16px"}}>
                     Pliki projektu:

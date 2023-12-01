@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { chatService } from "../../Services/chatService";
+import { apiService } from "../../Services/ApiService";
 import Paper from "@mui/material/Paper";
 import { CompatClient, Stomp } from "@stomp/stompjs";
 import TextField from "@mui/material/TextField";
@@ -73,7 +73,7 @@ export const ChatController = (props: Props) => {
     useEffect(scrollToBottom, [messages]);
 
     useEffect(() => {
-        chatService
+        apiService
             .getAllMessages()
             .then((data) => {
                 setMessages(data);
