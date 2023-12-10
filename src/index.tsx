@@ -4,7 +4,7 @@ import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import AuthenticationProvider from "./Providers/AuthenticationProvider";
 import {RouterProvider} from "react-router-dom";
-import {router} from "./Components/Routes";
+import {router} from "./Components/Routes/Routes";
 import {QueryClient, QueryClientProvider} from 'react-query'
 
 // window.fetch = fetchInterceptor;

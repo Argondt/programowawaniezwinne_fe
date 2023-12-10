@@ -2,6 +2,8 @@ import axios from 'axios';
 import keycloak from '../keycloak';
 import {ChatMessage} from '../Components/Interface/ChatMessage';
 import {ProjektyResponse} from '../Components/Interface/ProjektyResponse';
+import {User} from "../Components/users/User";
+import {TaskStatus} from "../Components/Interface/TaskStatus";
 
 const api = axios.create({
     baseURL: 'http://localhost:8080/api',
@@ -63,12 +65,48 @@ const getUsers = async () => {
     const response = await api.get('/users'); // URL do twojego backendowego endpointu
     return response.data;
 };
+const getUserById = async (userId: string) => {
+    const response = await api.get(`/users/${userId}`);
+    return response.data;
+};
 const createTask = async (taskData: any) => {
     const response = await api.post('/zadania', taskData); // URL do twojego backendowego endpointu tworzenia zadania
     return response.data;
 };
 const getProjectTask = async (id: any) => {
     const response = await api.get(`/zadania/projekt/${id}/zadania`); // URL do twojego backendowego endpointu tworzenia zadania
+    return response.data;
+};
+const getTaskById = async (id: any) => {
+    const response = await api.get(`/zadania/${id}`); // URL do twojego backendowego endpointu tworzenia zadania
+    return response.data;
+};
+
+export const sendMessage = async (message: ChatMessage): Promise<ChatMessage> => {
+    const response = await api.post('/app/chat.sendMessage', { // Replace with your actual send message endpoint
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
+    });
+
+    if (!response) {
+        throw new Error('Network response was not ok');
+    }
+
+    return await response.data(); // Or handle the response as needed
+};
+const updateUser = async (userId: string, userDetails: User) => {
+        const response = await api.put(`/users/${userId}/update`, userDetails);
+        return response.data;
+};
+const updateTaskStatus = async (zadanieId: string, userDetails: TaskStatus) => {
+        const response = await api.put(`/zadania/${zadanieId}/status`, userDetails);
+        return response.data;
+};
+const deleteUser = async (userId: string) => {
+    const response = await api.delete(`/users/${userId}/delete`);
     return response.data;
 };
 export const apiService = {
@@ -80,5 +118,10 @@ export const apiService = {
     downloadFile,
     getUsers,
     createTask,
-    getProjectTask
+    getProjectTask,
+    getUserById,
+    sendMessage,
+    updateUser,
+    deleteUser,
+    updateTaskStatus,getTaskById
 };

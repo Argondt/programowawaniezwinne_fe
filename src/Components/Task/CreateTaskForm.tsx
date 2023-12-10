@@ -1,22 +1,9 @@
-// CreateTaskDrawerForm.tsx
 import React, {useState} from 'react';
 import {useMutation, useQueryClient} from 'react-query';
 import {Drawer, Box, Button, TextField, Paper} from '@mui/material';
 import AddIcon from "@mui/icons-material/Add";
-import {apiService} from "../Services/ApiService";
-
-interface CreateTaskDrawerFormProps {
-    projectId: any;
-    onTaskAdded: () => void; // Callback wywoływany po dodaniu zadania
-
-}
-
-interface TaskData {
-    nazwa: string;
-    opis: string;
-    kolejnosc: number;
-    projektId: any;
-}
+import {apiService} from "../../Services/ApiService";
+import {CreateTaskDrawerFormProps, TaskData} from "../Interface/TaskData";
 
 const CreateTaskDrawerForm: React.FC<CreateTaskDrawerFormProps> = ({projectId, onTaskAdded}) => {
     const [drawerOpen, setDrawerOpen] = useState(false);

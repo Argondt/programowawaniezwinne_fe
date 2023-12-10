@@ -2,8 +2,8 @@
 import React from "react";
 import {Box, CircularProgress, Container, Grid, Paper, Typography} from "@mui/material";
 import {useQuery} from 'react-query';
-import {apiService} from "../Services/ApiService";
-import ProjektForm from "./ProjektAdd";
+import {apiService} from "../../Services/ApiService";
+import ProjektForm from "../Project/ProjektAdd";
 import {useNavigate} from "react-router";
 
 const Dashboard = () => {
@@ -11,7 +11,7 @@ const Dashboard = () => {
         apiService.getAllProjects({page: 0, size: 10})
     );
     const navigate = useNavigate();
-    if (isLoading) return <div><CircularProgress size={120} /></div>;
+    if (isLoading) return <div><CircularProgress size={120}/></div>;
     const handleProjectClick = (projektId: number) => {
         navigate(`/projekty/${projektId}`); // Navigate to the project's detail page
     };

@@ -5,4 +5,10 @@ export interface Projekt {
     endDate: string;
     startDate: string;
     modificationTime: string;
-  }
+}
+
+export interface ProjectFile {
+    id: string;
+    fileName: string;
+    url: string;
+}
