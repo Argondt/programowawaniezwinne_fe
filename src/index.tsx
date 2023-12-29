@@ -6,6 +6,8 @@ import AuthenticationProvider from "./Providers/AuthenticationProvider";
 import {RouterProvider} from "react-router-dom";
 import {router} from "./Components/Routes/Routes";
 import {QueryClient, QueryClientProvider} from 'react-query'
+import {SnackbarProvider} from "notistack";
+import { NotificationProvider } from "./Providers/NotificationContext";
 
 // window.fetch = fetchInterceptor;
 
@@ -16,9 +18,13 @@ const queryClient = new QueryClient();
 root.render(
     <AuthenticationProvider>
         <StrictMode>
-            <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router}/>
-            </QueryClientProvider>
+            <SnackbarProvider>
+                <NotificationProvider>
+                    <QueryClientProvider client={queryClient}>
+                        <RouterProvider router={router}/>
+                    </QueryClientProvider>
+                </NotificationProvider>
+            </SnackbarProvider>
         </StrictMode>
     </AuthenticationProvider>
 );

@@ -1,138 +1,40 @@
-// import React, {useEffect, useState} from 'react';
-// import {useQuery, useMutation, useQueryClient} from 'react-query';
-// import {Grid, Paper, Typography, Box, Button, Drawer, Container, CircularProgress} from "@mui/material";
-// import AddIcon from "@mui/icons-material/Add";
-// import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-// import { useParams } from "react-router-dom";
-// import { apiService } from '../Services/ApiService';
-// import { DragDropContext, Droppable, Draggable, DroppableProvided, DraggableProvided } from 'react-beautiful-dnd';
-// import CreateTaskDrawerForm from './CreateTaskForm';
-//
-// // Definicja interfejsu dla plików projektu
-// interface ProjectFile {
-//     id: string;
-//     fileName: string;
-//     url: string;
-// }
-// interface ProjectTask {
-//     id: string;
-//     name: string;
-//     status: string;
-// }
-// const KanbanBoard = () => {
-//     const { id: id } = useParams();
-//     const [drawerOpen, setDrawerOpen] = React.useState(false);
-//     const [drawerOpen1, setDrawerOpen1] = React.useState(false);
-//     const [selectedFiles, setSelectedFiles] = React.useState<FileList | null>(null);
-//     const queryClient = useQueryClient();
-//     const [columns, setColumns] = useState<{ [key: string]: ProjectTask[] }>({});
-//     // UseQuery do pobrania plików projektu
-//     const { data: plikiProjektu, isLoading, isError } = useQuery<ProjectFile[], Error>(
-//         ['plikiProjektu', id],
-//         () => apiService.getProjectFiles(id)
-//     );
-//
-//     const { data: projectTasks, isLoading: isLoadingTasks, isError: isErrorTasks } = useQuery<ProjectTask[], Error>(
-//         ['projectTasks', id],
-//         () => apiService.getProjectTask(id)
-//     );
-//
-//     useEffect(() => {
-//         console.log(projectTasks)
-//         if (projectTasks) {
-//             const groupedTasks = projectTasks.reduce((acc: { [x: string]: any; }, task: { status: string; }) => {
-//                 const status = task.status || 'no_status';
-//                 acc[status] = [...(acc[status] || []), task];
-//                 return acc;
-//             }, {});
-//             setColumns(groupedTasks);
-//         }
-//     }, [projectTasks]);
-//     // UseMutation dla przesyłania plików
-//     const uploadMutation = useMutation(
-//         (formData: FormData) => apiService.uploadFiles(formData, id),
-//         {
-//             onSuccess: () => {
-//                 // Odświeżanie danych po udanym przesłaniu pliku
-//                 queryClient.invalidateQueries(['plikiProjektu', id]);
-//                 setDrawerOpen(false)
-//             },
-//             onError: (error) => {
-//                 // Obsługa błędów
-//             },
-//         }
-//     );
-//
-//     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//         if (event.target.files) {
-//             setSelectedFiles(event.target.files);
-//         }
-//     };
-//
-//     const handleSubmit = () => {
-//         if (!selectedFiles) {
-//             return;
-//         }
-//
-//         const formData = new FormData();
-//         for (let i = 0; i < selectedFiles.length; i++) {
-//             formData.append("file", selectedFiles[i]);
-//         }
-//
-//         uploadMutation.mutate(formData);
-//     };
-//     const handleTaskAdded = () => {
-//         queryClient.invalidateQueries(['projectTasks', id]);
-//     };
-//     const handleDownload = async (filename: string) => {
-//         const url = await apiService.downloadFile(id, filename);
-//         window.open(url, '_blank');
-//     };
-//
-//     if (isLoadingTasks) return <div><CircularProgress size={120} /></div>;
-//     if (isErrorTasks) return <div>Error loading tasks</div>;
-//     const NoFilesMessage = () => (
-//         <Grid item xs={12}>
-//             <Paper elevation={3} style={{ padding: "20px", textAlign: "center" }}>
-//                 <Box display="flex" alignItems="center" justifyContent="center" flexDirection="column">
-//                     <ErrorOutlineIcon style={{ fontSize: 60, color: "#ff6f61" }} />
-//                     <Typography variant="h6" style={{ marginTop: "20px" }}>
-//                         Nie znaleziono plików
-//                     </Typography>
-//                     <Typography variant="body1" style={{ marginTop: "10px" }}>
-//                         Nie ma żadnych plików przypisanych do tego projektu.
-//                     </Typography>
-//                 </Box>
-//             </Paper>
-//         </Grid>
-//     );
-//
-//     if (isLoading) return <div><CircularProgress size={120} /></div>;
-//     if (isError) return <div>Error loading files</div>;
-//     const onDragEnd = () => {
-//         // Logika obsługi przeciągania i upuszczania
-//     };
-//     // @ts-ignore
 import React, {useEffect, useState} from 'react';
 import {useQuery, useMutation, useQueryClient} from 'react-query';
-import {Grid, Paper, Typography, Box, Button, Drawer, Container, CircularProgress} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import {useParams} from "react-router-dom";
 import {apiService} from '../../Services/ApiService';
-import {DragDropContext, Droppable, Draggable, DroppableProvided, DraggableProvided} from 'react-beautiful-dnd';
 import CreateTaskDrawerForm from './CreateTaskForm';
 import {TaskStatus} from "../Interface/TaskStatus";
 import {ProjectTask} from "../Interface/ProjectTask";
 import TaskDetailsDialog from "./TaskDetailsDialog";
 import {ColumnsType} from "../Interface/Utils";
 import {ProjectFile} from "../Interface/Projekt";
+import {
+    Container,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    CircularProgress,
+    Typography,
+    Box,
+    Button,
+    Drawer,
+    Grid // Add this import for Grid
+} from '@mui/material';
+import AddIcon from "@mui/icons-material/Add";
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+
 const KanbanBoard = () => {
     const {id} = useParams<{ id: string }>();
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
     const queryClient = useQueryClient();
     const [columns, setColumns] = useState<ColumnsType>({});
+    const [totalStoryPoints, setTotalStoryPoints] = useState(0);
+    const [completedStoryPoints, setCompletedStoryPoints] = useState(0);
 
     const {data: plikiProjektu, isLoading, isError} = useQuery<ProjectFile[], Error>(
         ['plikiProjektu', id],
@@ -150,34 +52,57 @@ const KanbanBoard = () => {
         setSelectedTask(task);
         setIsDetailsOpen(true);
     };
+    const handleDragEnd = (result: any) => {
+        const {source, destination} = result;
+        if (!destination) {
+            return;
+        }
 
+        if (source.droppableId !== destination.droppableId || source.index !== destination.index) {
+            const start = columns[source.droppableId];
+            const finish = columns[destination.droppableId];
+
+            if (start === finish) {
+                const newTaskIds = Array.from(start);
+                const [removed] = newTaskIds.splice(source.index, 1);
+                newTaskIds.splice(destination.index, 0, removed);
+
+                const newColumn = {
+                    ...columns,
+                    [source.droppableId]: newTaskIds,
+                };
+
+                setColumns(newColumn);
+            } else {
+                const startTaskIds = Array.from(start);
+                const [removed] = startTaskIds.splice(source.index, 1);
+                const finishTaskIds = Array.from(finish);
+                finishTaskIds.splice(destination.index, 0, removed);
+
+                const newColumn = {
+                    ...columns,
+                    [source.droppableId]: startTaskIds,
+                    [destination.droppableId]: finishTaskIds,
+                };
+
+                setColumns(newColumn);
+            }
+
+            // Here you would call your API to update the task status
+            // apiService.updateTaskStatus(removed.id, destination.droppableId);
+        }
+    };
     const handleCloseDetails = () => {
         setIsDetailsOpen(false);
         setSelectedTask(null);
     };
     useEffect(() => {
         if (projectTasks) {
-            const initialColumns: ColumnsType = {
-                [TaskStatus.TO_DO]: [],
-                [TaskStatus.IN_PROGRESS]: [],
-                [TaskStatus.DONE]: []
-            };
-
-            projectTasks.forEach(task => {
-                console.log(Object.values(TaskStatus)); // Sprawdź wartości enumu
-
-                let status = task.status || TaskStatus.TO_DO; // Domyślny status
-
-                // Dodaj logikę sprawdzającą, czy status zadania pasuje do jednego z enumów
-                if (!Object.values(TaskStatus).includes(status)) {
-                    status = TaskStatus.TO_DO; // Ustaw domyślny status, jeśli nie pasuje
-                }
-
-                initialColumns[status].push(task);
-            });
-
-            console.log(initialColumns); // Sprawdź, jak zadania są przypisywane
-            setColumns(initialColumns);
+            // Calculate the total and completed story points
+            const total = projectTasks.reduce((acc, task) => acc + (task.storyPoint || 0), 0);
+            const completed = projectTasks.reduce((acc, task) => acc + (task.status === TaskStatus.DONE ? task.storyPoint || 0 : 0), 0);
+            setTotalStoryPoints(total);
+            setCompletedStoryPoints(completed);
         }
     }, [projectTasks]);
 
@@ -206,7 +131,11 @@ const KanbanBoard = () => {
             setSelectedFiles(event.target.files);
         }
     };
-
+    const statusColors = {
+        [TaskStatus.TO_DO]: "#f0f0f0", // Light grey for TO_DO
+        [TaskStatus.IN_PROGRESS]: "#add8e6", // Light blue for IN PROGRESS
+        [TaskStatus.DONE]: "#90ee90", // Light green for DONE
+    };
     const handleSubmit = () => {
         if (!selectedFiles) {
             return;
@@ -288,22 +217,62 @@ const KanbanBoard = () => {
                 open={isDetailsOpen}
                 onClose={handleCloseDetails}
             />
-            <Box style={{ display: "flex", flexDirection: "row", gap: "16px" }}>
-                {Object.entries(columns).map(([columnId, tasks]) => (
-                    <Box key={columnId} style={{ flexGrow: 1, minWidth: 0, padding: "16px", border: "1px solid gray", borderRadius: "8px" }}>
-                        <Typography variant="h6">{columnId}</Typography>
-                        {tasks.map((task) => (
-                            <Paper
-                                key={task.id}
-                                style={{margin: "8px 0", padding: "8px"}}
-                                onClick={() => handleTaskClick(task)}
-                            >
-                                {task.name}
-                            </Paper>
-                        ))}
-                    </Box>
-                ))}
-            </Box>
+            {/*<Box style={{ display: "flex", flexDirection: "row", gap: "16px" }}>*/}
+            {/*    {Object.entries(columns).map(([columnId, tasks]) => (*/}
+            {/*        <Box key={columnId} style={{ flexGrow: 1, minWidth: 0, padding: "16px", border: "1px solid gray", borderRadius: "8px" }}>*/}
+            {/*            <Typography variant="h6">{columnId}</Typography>*/}
+            {/*            {tasks.map((task) => (*/}
+            {/*                <Paper*/}
+            {/*                    key={task.id}*/}
+            {/*                    style={{margin: "8px 0", padding: "8px"}}*/}
+            {/*                    onClick={() => handleTaskClick(task)}*/}
+            {/*                >*/}
+            {/*                    {task.name}*/}
+            {/*                </Paper>*/}
+            {/*            ))}*/}
+            {/*        </Box>*/}
+            {/*    ))}*/}
+            {/*</Box>*/}
+            <Typography variant="h6">
+                Total Story Points: {totalStoryPoints} | Completed: {completedStoryPoints}
+            </Typography>
+            <TableContainer component={Paper}>
+                <Table sx={{minWidth: 650}} aria-label="simple table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Task Name</TableCell>
+                            <TableCell>Story Points</TableCell>
+                            <TableCell>Status</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {projectTasks?.map((task: ProjectTask) => {
+                            const status = TaskStatus[task.status as keyof typeof TaskStatus]; // Get the text representation of the status.
+                            const color = statusColors[task.status as keyof typeof statusColors]; // Determine the color based on the task's status.
+
+                            return (
+                                <TableRow
+                                    key={task.id}
+                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    onClick={() => handleTaskClick(task)}
+                                >
+                                    <TableCell component="th" scope="row">
+                                        {task.name}
+                                    </TableCell>
+                                    <TableCell>
+                                        {task.storyPoint}
+                                    </TableCell>
+                                    <TableCell style={{backgroundColor: color}}>
+                                        {status}
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+
             <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3}}>
                 <Typography variant="h5" sx={{padding: "16px"}}>
                     Pliki projektu:

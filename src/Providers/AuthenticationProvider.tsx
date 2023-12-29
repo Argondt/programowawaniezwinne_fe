@@ -19,6 +19,7 @@ const tokenLogger = (tokens: AuthClientTokens) => {
 
 const initOptions = {
   onLoad: "login-required",
+  checkLoginIframe:false
 };
 
 const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {

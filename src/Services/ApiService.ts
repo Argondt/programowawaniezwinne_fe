@@ -28,6 +28,7 @@ interface GetAllProjectsParams {
     page?: number;
     size?: number;
     sort?: string;
+    nazwa?: string;
 }
 
 const getAllProjects = async (params: GetAllProjectsParams = {}) => {
@@ -98,12 +99,12 @@ export const sendMessage = async (message: ChatMessage): Promise<ChatMessage> =>
     return await response.data(); // Or handle the response as needed
 };
 const updateUser = async (userId: string, userDetails: User) => {
-        const response = await api.put(`/users/${userId}/update`, userDetails);
-        return response.data;
+    const response = await api.put(`/users/${userId}/update`, userDetails);
+    return response.data;
 };
 const updateTaskStatus = async (zadanieId: string, userDetails: TaskStatus) => {
-        const response = await api.put(`/zadania/${zadanieId}/status`, userDetails);
-        return response.data;
+    const response = await api.put(`/zadania/${zadanieId}/status`, userDetails);
+    return response.data;
 };
 const deleteUser = async (userId: string) => {
     const response = await api.delete(`/users/${userId}/delete`);
@@ -123,5 +124,5 @@ export const apiService = {
     sendMessage,
     updateUser,
     deleteUser,
-    updateTaskStatus,getTaskById
+    updateTaskStatus, getTaskById
 };

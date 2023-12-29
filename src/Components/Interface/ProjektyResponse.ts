@@ -1,8 +1,9 @@
-import { Projekt } from "./Projekt";
+import {Projekt} from "./Projekt";
+import {ProjectIdx} from "./ProjectIdx";
 
 
 export interface ProjektyResponse {
-    content: Projekt[];
+    content: ProjectIdx[];
     pageable: {
         sort: {
             empty: boolean;
