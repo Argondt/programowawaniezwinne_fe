@@ -53,7 +53,7 @@ const TaskDetailsDialog: React.FC<TaskDetailsProps> = ({task, open, onClose}) =>
                     </Grid>
                     <Divider variant="middle" sx={{width: '100%', my: 2}}/>
                     <Grid item xs={12}>
-                        <Typography variant="caption" color="textSecondary">Assigned to</Typography>
+                        <Typography variant="caption" color="textSecondary">Przypisane do</Typography>
                         <Typography sx={{display: 'flex', alignItems: 'center', mt: 0.5}}>
                             <PersonIcon fontSize="small" sx={{mr: 1}}/>
                             {task?.name}
@@ -61,7 +61,7 @@ const TaskDetailsDialog: React.FC<TaskDetailsProps> = ({task, open, onClose}) =>
                     </Grid>
                     <Divider variant="middle" sx={{width: '100%', my: 2}}/>
                     <Grid item xs={12}>
-                        <Typography variant="caption" color="textSecondary">Due Date</Typography>
+                        <Typography variant="caption" color="textSecondary">Deadline</Typography>
                         <Typography sx={{display: 'flex', alignItems: 'center', mt: 0.5}}>
                             <EventIcon fontSize="small" sx={{mr: 1}}/>
                             {task?.endDate}
@@ -69,7 +69,7 @@ const TaskDetailsDialog: React.FC<TaskDetailsProps> = ({task, open, onClose}) =>
                     </Grid>
                     <Divider variant="middle" sx={{width: '100%', my: 2}}/>
                     <Grid item xs={12}>
-                        <Typography variant="caption" color="textSecondary">Labels</Typography>
+                        <Typography variant="caption" color="textSecondary">Etykiety</Typography>
                         <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px'}}>
 
                             <Chip icon={<LabelIcon/>} label={task?.name} size="small"/>
@@ -78,7 +78,7 @@ const TaskDetailsDialog: React.FC<TaskDetailsProps> = ({task, open, onClose}) =>
                     </Grid>
                     <Divider variant="middle" sx={{width: '100%', my: 2}}/>
                     <Grid item xs={12}>
-                        <Typography variant="caption" color="textSecondary">Description</Typography>
+                        <Typography variant="caption" color="textSecondary">Opis</Typography>
                         <Typography paragraph sx={{mt: 0.5}}>{task?.description}</Typography>
                     </Grid>
                 </Grid>

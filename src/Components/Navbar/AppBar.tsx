@@ -16,7 +16,7 @@ export const AppBarMenu = () => {
       {/* Dark background color */}
       <Toolbar>
         <Typography variant="h6" style={{ flexGrow: 1 }}>
-          Nazwa Twojej Aplikacji
+          Projekt Programowanie Zwinne 2024
         </Typography>
         <Button
           variant="outlined"

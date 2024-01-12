@@ -88,7 +88,7 @@ const KanbanBoard = () => {
                 setColumns(newColumn);
             }
 
-            // Here you would call your API to update the task status
+            // Tu można puścić call do API by zmienić status taska
             // apiService.updateTaskStatus(removed.id, destination.droppableId);
         }
     };
@@ -159,7 +159,7 @@ const KanbanBoard = () => {
     };
 
     if (isLoadingTasks) return <div><CircularProgress size={120}/></div>;
-    if (isErrorTasks) return <div>Error loading tasks</div>;
+    if (isErrorTasks) return <div>Error z załadowaniem zadań</div>;
 
     const NoFilesMessage = () => (
         <Grid item xs={12}>
@@ -178,7 +178,7 @@ const KanbanBoard = () => {
     );
 
     if (isLoading) return <div><CircularProgress size={120}/></div>;
-    if (isError) return <div>Error loading files</div>;
+    if (isError) return <div>Error wczytania plików</div>;
 
     return (
         <Container>
@@ -191,7 +191,7 @@ const KanbanBoard = () => {
 
             <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
                 <Box sx={{width: 250, padding: 3}}>
-                    <Typography variant="h6">Upload Files</Typography>
+                    <Typography variant="h6">Wgraj pliki</Typography>
                     <input type="file" multiple onChange={handleFileChange} style={{display: "none"}} id="file-input"/>
                     <label htmlFor="file-input" style={{width: "100%"}}>
                         <Box sx={{
@@ -204,10 +204,10 @@ const KanbanBoard = () => {
                             justifyContent: 'center',
                             cursor: 'pointer'
                         }}>
-                            Drag and drop files here or click to select files
+                            Przeciągnij i upuść pliki tutaj lub kliknij, aby wybrać pliki
                         </Box>
                     </label>
-                    <Button onClick={handleSubmit}>Upload</Button>
+                    <Button onClick={handleSubmit}>WGRAJ</Button>
                 </Box>
             </Drawer>
 
@@ -234,13 +234,13 @@ const KanbanBoard = () => {
             {/*    ))}*/}
             {/*</Box>*/}
             <Typography variant="h6">
-                Total Story Points: {totalStoryPoints} | Completed: {completedStoryPoints}
+                Suma Story Points: {totalStoryPoints} | Ukończono: {completedStoryPoints}
             </Typography>
             <TableContainer component={Paper}>
                 <Table sx={{minWidth: 650}} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>Task Name</TableCell>
+                            <TableCell>Nazwa zadania</TableCell>
                             <TableCell>Story Points</TableCell>
                             <TableCell>Status</TableCell>
                         </TableRow>

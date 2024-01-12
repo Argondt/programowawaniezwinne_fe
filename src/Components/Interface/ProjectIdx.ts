@@ -1,6 +1,6 @@
 export interface ProjectIdx {
     id: string;
-    projectId: string; // Assuming UUIDs are represented as strings
+    projectId: string; // Zakładamy że UUIDy są jako string
     name: string;
     description: string;
 
