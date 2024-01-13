@@ -4,6 +4,8 @@ import {ChatMessage} from '../Components/Interface/ChatMessage';
 import {ProjektyResponse} from '../Components/Interface/ProjektyResponse';
 import {User} from "../Components/users/User";
 import {TaskStatus} from "../Components/Interface/TaskStatus";
+import {TaskData, TaskDataUpdate} from "../Components/Interface/TaskData";
+import {ProjektUpdate} from "../Components/Interface/Projekt";
 
 const api = axios.create({
     baseURL: 'http://localhost:8080/api',
@@ -110,6 +112,14 @@ const deleteUser = async (userId: string) => {
     const response = await api.delete(`/users/${userId}/delete`);
     return response.data;
 };
+const updateTask = async (zadanieId: string, taskData: TaskDataUpdate): Promise<any> => {
+    const response = await api.put(`/zadania/${zadanieId}`, taskData);
+    return response.data;
+};
+const updateProject = async (projektId: string, projektUpdate: ProjektUpdate): Promise<any> => {
+    const response = await api.put(`/projekty/${projektId}`, projektUpdate);
+    return response.data;
+};
 export const apiService = {
     getAllMessages,
     getAllProjects,
@@ -124,5 +134,7 @@ export const apiService = {
     sendMessage,
     updateUser,
     deleteUser,
-    updateTaskStatus, getTaskById
+    updateTaskStatus,
+    getTaskById,
+    updateTask, updateProject
 };

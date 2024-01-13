@@ -1,42 +1,62 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useMutation, useQueryClient} from 'react-query';
 import {Drawer, Box, Button, TextField, Paper} from '@mui/material';
-import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import {apiService} from "../../Services/ApiService";
-import {CreateTaskDrawerFormProps, TaskData, TaskDataCreate} from "../Interface/TaskData";
+import {TaskData, TaskDataUpdate} from "../Interface/TaskData";
+import {Task} from "./TaskInterface";
 
-const CreateTaskDrawerForm: React.FC<CreateTaskDrawerFormProps> = ({projectId, onTaskAdded}) => {
+interface EditTaskDrawerFormProps {
+    task: Task;
+    onTaskUpdated: () => void;
+}
+
+const EditTaskDrawerForm: React.FC<EditTaskDrawerFormProps> = ({task, onTaskUpdated}) => {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [taskName, setTaskName] = useState('');
     const [taskDescription, setTaskDescription] = useState('');
     const [taskOrder, setTaskOrder] = useState('');
-    const queryClient = useQueryClient();
+    const [isEditDrawerOpen, setEditDrawerOpen] = useState(false);
+    const [currentTask, setCurrentTask] = useState<Task | null>(null);
 
-    const createTaskMutation = useMutation(
-        (taskData: TaskDataCreate) => apiService.createTask(taskData),
+    useEffect(() => {
+        setTaskName(task.name);
+        setTaskDescription(task.description);
+    }, [task]);
+
+
+    const updateTaskMutation = useMutation(
+        (taskData: TaskDataUpdate) => {
+            if (currentTask && currentTask.id) {
+                return apiService.updateTask(currentTask.id, taskData);
+            }
+            throw new Error('Current task or task ID is undefined.');
+        },
         {
             onSuccess: () => {
-                onTaskAdded(); // Wywołanie callbacku po pomyślnym dodaniu zadania
-                setDrawerOpen(false);
-            }
+                onTaskUpdated(); // Callback for after the task is successfully updated
+                // ... other success handling
+            },
+            // ... other configuration like onError
         }
     );
 
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        createTaskMutation.mutate({
-            nazwa: taskName,
-            opis: taskDescription,
-            kolejnosc: Number(taskOrder),
-            projektId: projectId
-        });
+            updateTaskMutation.mutate({
+                nazwa: taskName,
+                opis: taskDescription,
+                kolejnosc: Number(taskOrder)
+            });
     };
 
     return (
         <>
-            <Button variant="outlined" startIcon={<AddIcon/>} onClick={() => setDrawerOpen(true)}>
-                Dodaj Zadanie
+            <Button variant="outlined" startIcon={<EditIcon/>} onClick={() => setDrawerOpen(true)}>
+                Edytuj Zadanie
             </Button>
+
 
             <Drawer
                 anchor="right"
@@ -68,7 +88,7 @@ const CreateTaskDrawerForm: React.FC<CreateTaskDrawerFormProps> = ({projectId, o
                                 required
                             />
                             <Button type="submit" variant="contained" color="primary">
-                                Utwórz zadanie
+                                Aktualizuj zadanie
                             </Button>
                         </Box>
                     </form>
@@ -78,4 +98,4 @@ const CreateTaskDrawerForm: React.FC<CreateTaskDrawerFormProps> = ({projectId, o
     );
 };
 
-export default CreateTaskDrawerForm;
+export default EditTaskDrawerForm;

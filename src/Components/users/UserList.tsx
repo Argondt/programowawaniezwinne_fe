@@ -15,9 +15,9 @@ import {
     TableRow,
     TablePagination,
     Button,
-    IconButton
+    IconButton, Chip
 } from '@mui/material';
-import {User} from "./User";
+import {Role, User} from "./User";
 import {useNavigate} from "react-router";
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
@@ -37,7 +37,7 @@ const UserList: React.FC<Props> = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [users, setUsers] = useState<User[]>([]);
 
-    const {data, isLoading, isError, error} = useQuery<User[], Error>('users', apiService.getUsers, {
+    const {data, isLoading, isError, error,refetch} = useQuery<User[], Error>('users', apiService.getUsers, {
         onSuccess: (data) => {
             setUsers(data); // aktualizacja stanu users danymi z zapytania
         }
@@ -81,48 +81,41 @@ const UserList: React.FC<Props> = () => {
             <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                     <Typography variant="h5">Lista użytkowników</Typography>
-                    {/*<Button variant="contained" color="primary" onClick={() => navigate('/add-user')}>*/}
-                    {/*    Add User*/}
-                    {/*</Button>*/}
                     {selectedUser && (
                         <UpdateUserForm
                             user={selectedUser}
                             isOpen={isUpdateFormOpen}
                             onClose={handleCloseUpdateForm}
+                            onUpdated={refetch}
                         />
                     )}
-                </Box>
-                <Box mb={2}>
-                    <TextField
-                        variant="outlined"
-                        placeholder="Search User"
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon/>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
                 </Box>
                 <TableContainer>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>No</TableCell>
-                                <TableCell>Profile</TableCell>
+                                <TableCell></TableCell>
+                                <TableCell>Imię i Nazwisko</TableCell>
                                 <TableCell>Email</TableCell>
                                 <TableCell>Role</TableCell>
-                                <TableCell>Actions</TableCell>
+                                <TableCell></TableCell>
                             </TableRow>
                         </TableHead>
+
                         <TableBody>
                             {users?.map((user, index) => (
                                 <TableRow key={user.id}>
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell>{user.firstName} {user.lastName}</TableCell>
                                     <TableCell>{user.email}</TableCell>
-                                    <TableCell>{/* Role information if available */}</TableCell>
+                                    <TableCell>
+                                        <div>
+                                            {user.roles.filter(role => Object.keys(Role).includes(role)).map((role, index) => (
+                                                <Chip key={index} label={role}
+                                                      style={{marginRight: '5px', marginBottom: '5px'}}/>
+                                            ))}
+                                        </div>
+                                    </TableCell>
                                     <TableCell>
                                         <IconButton color="primary" onClick={() => handleUserClick(user.id)}>
                                             <SearchIcon/>

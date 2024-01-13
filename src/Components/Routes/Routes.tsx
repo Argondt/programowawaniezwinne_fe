@@ -17,18 +17,7 @@ export const router = createBrowserRouter([
             {path: "chat", element: <ChatController/>},
             {path: "users", element: <UserList />},
             {path: "users/:id", element: <UserDetailsView />},
-            {path: "projekty/:id", element: <KanbanBoard/>},
-            //   {
-            //     path: "company/:ticker",
-            //     element: <CompanyPage />,
-            //     children: [
-            //       { path: "company-profile", element: <CompanyProfile /> },
-            //       { path: "income-statement", element: <IncomeStatement /> },
-            //       { path: "balance-sheet", element: <BalanceSheet /> },
-            //       { path: "cashflow-statement", element: <CashflowStatement /> },
-            //       { path: "historical-dividend", element: <HistoricalDividend /> },
-            //     ],
-            //   },
+            {path: "projekty/:id", element: <KanbanBoard/>}
         ],
     },
 ]);

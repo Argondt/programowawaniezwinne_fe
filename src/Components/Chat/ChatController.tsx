@@ -89,7 +89,6 @@ export const ChatController = (props: Props) => {
                 stompClient.subscribe('/topic/public', function (greeting) {
                     const newMessage = JSON.parse(greeting.body);
 
-                    // Update messages only if the new message doesn't exist in the current state
                     queryClient.setQueryData<ChatMessage[]>('messages', oldMessages => {
                         if (oldMessages && !oldMessages.find(msg => msg.messageId === newMessage.messageId)) {
                             return [...oldMessages, newMessage];

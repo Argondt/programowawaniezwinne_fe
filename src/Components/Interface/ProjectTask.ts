@@ -6,5 +6,5 @@ export interface ProjectTask {
     status: TaskStatus;
     storyPoint: number;
     description: string;
-    endDate: string; // Data jako string ISO, można dostosować typ
+    endDate: string;
 }

@@ -22,10 +22,14 @@ import {
     Box,
     Button,
     Drawer,
-    Grid // Add this import for Grid
+    Grid ,
+    IconButton
 } from '@mui/material';
 import AddIcon from "@mui/icons-material/Add";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import {UpdateForm} from "./UpdateForm";
+import EditIcon from '@mui/icons-material/Edit'; // Import the edit icon
+import VisibilityIcon from '@mui/icons-material/Visibility'; // Import the visibility icon
 
 const KanbanBoard = () => {
     const {id} = useParams<{ id: string }>();
@@ -35,7 +39,20 @@ const KanbanBoard = () => {
     const [columns, setColumns] = useState<ColumnsType>({});
     const [totalStoryPoints, setTotalStoryPoints] = useState(0);
     const [completedStoryPoints, setCompletedStoryPoints] = useState(0);
+    const [selectedTask1, setSelectedTask1] = useState(null);
+    const [isUpdateFormOpen, setUpdateFormOpen] = useState(false);
 
+    const handleTaskUpdated = () => {
+        // Invalidate queries to refetch tasks
+        queryClient.invalidateQueries('tasks');
+        // Reset the selected task
+        setSelectedTask(null);
+    };
+
+// When a task edit button is clicked, set that task as the selectedTask
+    const handleEditClick = (task: any) => {
+        setSelectedTask1(task);
+    };
     const {data: plikiProjektu, isLoading, isError} = useQuery<ProjectFile[], Error>(
         ['plikiProjektu', id],
         () => apiService.getProjectFiles(id)
@@ -161,6 +178,16 @@ const KanbanBoard = () => {
     if (isLoadingTasks) return <div><CircularProgress size={120}/></div>;
     if (isErrorTasks) return <div>Error loading tasks</div>;
 
+    // Handles opening the form with the selected task's data
+    const handleRowClick = (task: ProjectTask) => {
+        setSelectedTask(task);
+        setUpdateFormOpen(true);
+    };
+
+    const handleCloseForm = () => {
+        setUpdateFormOpen(false);
+        setSelectedTask(null); // Clear the selected task when the form is closed
+    };
     const NoFilesMessage = () => (
         <Grid item xs={12}>
             <Paper elevation={3} style={{padding: "20px", textAlign: "center"}}>
@@ -217,61 +244,95 @@ const KanbanBoard = () => {
                 open={isDetailsOpen}
                 onClose={handleCloseDetails}
             />
-            {/*<Box style={{ display: "flex", flexDirection: "row", gap: "16px" }}>*/}
-            {/*    {Object.entries(columns).map(([columnId, tasks]) => (*/}
-            {/*        <Box key={columnId} style={{ flexGrow: 1, minWidth: 0, padding: "16px", border: "1px solid gray", borderRadius: "8px" }}>*/}
-            {/*            <Typography variant="h6">{columnId}</Typography>*/}
-            {/*            {tasks.map((task) => (*/}
-            {/*                <Paper*/}
-            {/*                    key={task.id}*/}
-            {/*                    style={{margin: "8px 0", padding: "8px"}}*/}
-            {/*                    onClick={() => handleTaskClick(task)}*/}
-            {/*                >*/}
-            {/*                    {task.name}*/}
-            {/*                </Paper>*/}
-            {/*            ))}*/}
-            {/*        </Box>*/}
-            {/*    ))}*/}
-            {/*</Box>*/}
+
             <Typography variant="h6">
                 Total Story Points: {totalStoryPoints} | Completed: {completedStoryPoints}
             </Typography>
-            <TableContainer component={Paper}>
-                <Table sx={{minWidth: 650}} aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Task Name</TableCell>
-                            <TableCell>Story Points</TableCell>
-                            <TableCell>Status</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {projectTasks?.map((task: ProjectTask) => {
-                            const status = TaskStatus[task.status as keyof typeof TaskStatus]; // Get the text representation of the status.
-                            const color = statusColors[task.status as keyof typeof statusColors]; // Determine the color based on the task's status.
+            {/*<TableContainer component={Paper}>*/}
+            {/*    <Table sx={{minWidth: 650}} aria-label="simple table">*/}
+            {/*        <TableHead>*/}
+            {/*            <TableRow>*/}
+            {/*                <TableCell>Task Name</TableCell>*/}
+            {/*                <TableCell>Story Points</TableCell>*/}
+            {/*                <TableCell>Status</TableCell>*/}
+            {/*            </TableRow>*/}
+            {/*        </TableHead>*/}
+            {/*        <TableBody>*/}
+            {/*            {projectTasks?.map((task: ProjectTask) => {*/}
+            {/*                const status = TaskStatus[task.status as keyof typeof TaskStatus]; // Get the text representation of the status.*/}
+            {/*                const color = statusColors[task.status as keyof typeof statusColors]; // Determine the color based on the task's status.*/}
 
-                            return (
-                                <TableRow
-                                    key={task.id}
-                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                    onClick={() => handleTaskClick(task)}
-                                >
-                                    <TableCell component="th" scope="row">
-                                        {task.name}
-                                    </TableCell>
-                                    <TableCell>
-                                        {task.storyPoint}
-                                    </TableCell>
-                                    <TableCell style={{backgroundColor: color}}>
-                                        {status}
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            {/*                return (*/}
+            {/*                    <TableRow*/}
+            {/*                        key={task.id}*/}
+            {/*                        sx={{'&:last-child td, &:last-child th': {border: 0}}}*/}
+            {/*                    >*/}
+            {/*                        <TableCell component="th" scope="row">*/}
+            {/*                            {task.name}*/}
+            {/*                        </TableCell>*/}
+            {/*                        <TableCell>*/}
+            {/*                            {task.storyPoint}*/}
+            {/*                        </TableCell>*/}
+            {/*                        <TableCell style={{backgroundColor: color}}>*/}
+            {/*                            {status}*/}
+            {/*                        </TableCell>*/}
+            {/*                    </TableRow>*/}
+            {/*                );*/}
+            {/*            })}*/}
+            {/*        </TableBody>*/}
+            {/*    </Table>*/}
+            {/*</TableContainer>*/}
+            <div>
+                <TableContainer component={Paper}>
+                    <Table sx={{minWidth: 650}} aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Task Name</TableCell>
+                                <TableCell>Story Points</TableCell>
+                                <TableCell>Status</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {projectTasks?.map((task: ProjectTask) => {
+                                const status = TaskStatus[task.status as keyof typeof TaskStatus]; // Get the text representation of the status.
+                                const color = statusColors[task.status as keyof typeof statusColors]; // Determine the color based on the task's status.
 
+                                return (
+                                    <TableRow
+                                        key={task.id}
+                                        sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    >
+                                        <TableCell component="th" scope="row">
+                                            {task.name}
+                                        </TableCell>
+                                        <TableCell>
+                                            {task.storyPoint}
+                                        </TableCell>
+                                        <TableCell style={{backgroundColor: color}}>
+                                            {status}
+                                        </TableCell>
+                                        <TableCell>
+                                            <IconButton color="primary" onClick={() => handleTaskClick(task)}>
+                                                <VisibilityIcon />
+                                            </IconButton>
+                                        </TableCell>
+                                        <TableCell>
+                                            <IconButton color="secondary" onClick={() => handleRowClick(task)}>
+                                                <EditIcon />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                {/* Conditionally render the UpdateForm if a task is selected */}
+                {selectedTask && (
+                    <UpdateForm open={isUpdateFormOpen} onClose={handleCloseForm} task={selectedTask}/>
+                )}
+            </div>
 
             <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3}}>
                 <Typography variant="h5" sx={{padding: "16px"}}>
