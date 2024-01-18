@@ -1,5 +1,9 @@
 import React, {useState} from "react";
-import {Box, CircularProgress, Container, Grid, IconButton, Paper, Typography} from "@mui/material";
+import {
+    Box, Button, CircularProgress, Container, Dialog,
+    DialogActions,
+    DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Paper, Typography
+} from "@mui/material";
 import {useQuery} from 'react-query';
 import {apiService} from "../../Services/ApiService";
 import ProjektForm from "../Project/ProjektAdd";
@@ -9,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import UpdateProjectForm from "../Project/UpdateProject";
 import {ProjektUpdate, ProjektUpdatedTO} from "../Interface/Projekt";
 import {isAdmin, isUserInGroup} from "../../keycloak";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Dashboard = () => {
     const notification = useNotification();
@@ -21,6 +26,7 @@ const Dashboard = () => {
     );
     const navigate = useNavigate();
     if (isLoading) return <div><CircularProgress size={120}/></div>;
+
 
     let handleSearchChange: (event: any) => void;
     handleSearchChange = (event: any) => {
@@ -41,70 +47,79 @@ const Dashboard = () => {
         }
         navigate(`/projekty/${projectId}`); // Navigate to the project's detail page only if projectId is valid
     };
-
+    const handleDeleteProject = (projectId: any) => {
+        if (window.confirm('Czy na pewno chcesz usunąć ten projekt?')) { // Opcjonalne: proste potwierdzenie
+            apiService.deleteProject(projectId)
+                .then(() => {
+                    notification.success('Projekt został usunięty.');
+                })
+                .catch(error => {
+                    notification.error('Wystąpił błąd podczas usuwania projektu.');
+                });
+        }
+    };
 
     // @ts-ignore
     return (
         <Container>
             <Box style={{padding: "20px", display: "flex", justifyContent: "flex-end", marginBottom: "20px"}}>
                 <input type="text" value={searchQuery} onChange={handleSearchChange}
-                       placeholder="Search Projects"/> {/* Search input */}
+                       placeholder="Szukaj projektu po nazwie"/>
                 <ProjektForm/>
             </Box>
             <Box style={{padding: "20px"}}>
                 <Grid container spacing={3}>
-                    {isAdmin() ? (
-                        projekty?.content.map((projekt) => (
-                            isUserInGroup("/" + projekt.name) ? (
-                                <Grid item xs={12} sm={6} md={4} key={projekt.id}
-                                      onMouseEnter={() => setHoveredProjectId(projekt.id)}
-                                      onMouseLeave={() => setHoveredProjectId(null)}
-                                >
-                                    <div style={{position: 'relative'}}> {/* Container for hover effect */}
-                                        <Paper elevation={3}
-                                               style={{padding: "20px", textAlign: "center", position: 'relative'}}
-                                               onClick={() => handleProjectClick(projekt.projectId)}
-                                        >
-                                            <Typography variant="h6" style={{marginBottom: "10px"}}>
-                                                {projekt.name}
-                                            </Typography>
-                                            <Typography variant="body2" style={{marginBottom: "10px"}}>
-                                                {projekt.description}
-                                            </Typography>
-                                        </Paper>
+                    {isAdmin() ? projekty?.content.map((projekt) => (
+                        isUserInGroup("/" + projekt.name) ? (
+                            <Grid item xs={12} sm={6} md={4} key={projekt.id}
+                                  onMouseEnter={() => setHoveredProjectId(projekt.id)}
+                                  onMouseLeave={() => setHoveredProjectId(null)}
+                            >
+                                <div style={{position: 'relative'}}> {/* Container for hover effect */}
+                                    <Paper elevation={3}
+                                           style={{padding: "20px", textAlign: "center", position: 'relative'}}
+                                           onClick={() => handleProjectClick(projekt.projectId)}
+                                    >
+                                        <Typography variant="h6" style={{marginBottom: "10px"}}>
+                                            {projekt.name}
+                                        </Typography>
+                                        <Typography variant="body2" style={{marginBottom: "10px"}}>
+                                            {projekt.description}
+                                        </Typography>
+                                    </Paper>
 
-                                        {/* Edit icon bar */}
-                                        {hoveredProjectId === projekt.id && (
-                                            <Box style={{
-                                                position: "absolute",
-                                                top: '-50px', // Positioning the bar above the tile
-                                                left: 0,
-                                                right: 0,
-                                                backgroundColor: "white",
-                                                padding: "10px",
-                                                display: "flex",
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                                zIndex: 2 // Ensures the box is above other elements
+                                    {/* Edit icon bar */}
+                                    {hoveredProjectId === projekt.id && (
+                                        <Box style={{
+                                            position: "absolute",
+                                            top: '-50px', // Positioning the bar above the tile
+                                            left: 0,
+                                            right: 0,
+                                            backgroundColor: "white",
+                                            padding: "10px",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            zIndex: 2 // Ensures the box is above other elements
+                                        }}>
+                                            <IconButton onClick={(e) => {
+                                                e.stopPropagation();
+                                                const projektUpdate: ProjektUpdatedTO = {
+                                                    projectId: projekt.projectId,
+                                                    name: projekt.name,
+                                                    description: projekt.description,
+                                                };
+                                                handleEditProject(projektUpdate);
                                             }}>
-                                                <IconButton onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    const projektUpdate: ProjektUpdatedTO = {
-                                                        projectId: projekt.projectId,
-                                                        name: projekt.name,
-                                                        description: projekt.description,
-                                                    };
-                                                    handleEditProject(projektUpdate);
-                                                }}>
-                                                    <EditIcon color="action"/>
-                                                </IconButton>
-                                            </Box>
-                                        )}
-                                    </div>
-                                </Grid>
-                            ) : null // Zwraca null, gdy użytkownik nie jest autoryzowany
-                        ))
-                    ) : (projekty?.content.map((projekt) => (
+                                                <EditIcon color="action"/>
+                                                <DeleteIcon color="action"/>
+                                            </IconButton>
+                                        </Box>
+                                    )}
+                                </div>
+                            </Grid>
+                        ) : null // Zwraca null, gdy użytkownik nie jest autoryzowany
+                    )) : projekty?.content.map((projekt) => (
                         <Grid item xs={12} sm={6} md={4} key={projekt.id}
                               onMouseEnter={() => setHoveredProjectId(projekt.id)}
                               onMouseLeave={() => setHoveredProjectId(null)}
@@ -147,11 +162,17 @@ const Dashboard = () => {
                                         }}>
                                             <EditIcon color="action"/>
                                         </IconButton>
+                                        <IconButton onClick={(e) => {
+                                            console.log(projekt.projectId);
+                                            handleDeleteProject(projekt.projectId)
+                                        }}>
+                                            <DeleteIcon color="action"/>
+                                        </IconButton>
                                     </Box>
                                 )}
                             </div>
                         </Grid>
-                    )))}
+                    ))}
                 </Grid>
                 {selectedProject && <UpdateProjectForm projekt={selectedProject} open={true}/>}
             </Box>

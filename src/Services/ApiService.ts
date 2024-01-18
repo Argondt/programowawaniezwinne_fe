@@ -120,6 +120,10 @@ const updateProject = async (projektId: string, projektUpdate: ProjektUpdate): P
     const response = await api.put(`/projekty/${projektId}`, projektUpdate);
     return response.data;
 };
+const deleteProject = async (projektId: string): Promise<any> => {
+    const response = await api.delete(`/projekty/${projektId}`);
+    return response.data;
+};
 export const apiService = {
     getAllMessages,
     getAllProjects,
@@ -136,5 +140,5 @@ export const apiService = {
     deleteUser,
     updateTaskStatus,
     getTaskById,
-    updateTask, updateProject
+    updateTask, updateProject, deleteProject
 };
