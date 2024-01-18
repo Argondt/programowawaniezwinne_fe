@@ -94,11 +94,11 @@ const UserList: React.FC<Props> = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell></TableCell>
-                                <TableCell>Imię i Nazwisko</TableCell>
+                                <TableCell>No</TableCell>
+                                <TableCell>Profile</TableCell>
                                 <TableCell>Email</TableCell>
                                 <TableCell>Role</TableCell>
-                                <TableCell></TableCell>
+                                <TableCell>Actions</TableCell>
                             </TableRow>
                         </TableHead>
 

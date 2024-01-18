@@ -176,7 +176,7 @@ const KanbanBoard = () => {
     };
 
     if (isLoadingTasks) return <div><CircularProgress size={120}/></div>;
-    if (isErrorTasks) return <div>Error loading tasks</div>;
+    if (isErrorTasks) return <div>Error z załadowaniem zadań</div>;
 
     // Handles opening the form with the selected task's data
     const handleRowClick = (task: ProjectTask) => {
@@ -205,7 +205,7 @@ const KanbanBoard = () => {
     );
 
     if (isLoading) return <div><CircularProgress size={120}/></div>;
-    if (isError) return <div>Error loading files</div>;
+    if (isError) return <div>Error wczytania plików</div>;
 
     return (
         <Container>
@@ -218,7 +218,7 @@ const KanbanBoard = () => {
 
             <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
                 <Box sx={{width: 250, padding: 3}}>
-                    <Typography variant="h6">Upload Files</Typography>
+                    <Typography variant="h6">Wgraj pliki</Typography>
                     <input type="file" multiple onChange={handleFileChange} style={{display: "none"}} id="file-input"/>
                     <label htmlFor="file-input" style={{width: "100%"}}>
                         <Box sx={{
@@ -231,10 +231,10 @@ const KanbanBoard = () => {
                             justifyContent: 'center',
                             cursor: 'pointer'
                         }}>
-                            Drag and drop files here or click to select files
+                            Przeciągnij i upuść pliki tutaj lub kliknij, aby wybrać pliki
                         </Box>
                     </label>
-                    <Button onClick={handleSubmit}>Upload</Button>
+                    <Button onClick={handleSubmit}>WGRAJ</Button>
                 </Box>
             </Drawer>
 
@@ -246,87 +246,43 @@ const KanbanBoard = () => {
             />
 
             <Typography variant="h6">
-                Total Story Points: {totalStoryPoints} | Completed: {completedStoryPoints}
+                Suma Story Points: {totalStoryPoints} | Ukończono: {completedStoryPoints}
             </Typography>
-            {/*<TableContainer component={Paper}>*/}
-            {/*    <Table sx={{minWidth: 650}} aria-label="simple table">*/}
-            {/*        <TableHead>*/}
-            {/*            <TableRow>*/}
-            {/*                <TableCell>Task Name</TableCell>*/}
-            {/*                <TableCell>Story Points</TableCell>*/}
-            {/*                <TableCell>Status</TableCell>*/}
-            {/*            </TableRow>*/}
-            {/*        </TableHead>*/}
-            {/*        <TableBody>*/}
-            {/*            {projectTasks?.map((task: ProjectTask) => {*/}
-            {/*                const status = TaskStatus[task.status as keyof typeof TaskStatus]; // Get the text representation of the status.*/}
-            {/*                const color = statusColors[task.status as keyof typeof statusColors]; // Determine the color based on the task's status.*/}
+            <TableContainer component={Paper}>
+                <Table sx={{minWidth: 650}} aria-label="simple table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Nazwa zadania</TableCell>
+                            <TableCell>Story Points</TableCell>
+                            <TableCell>Status</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {projectTasks?.map((task: ProjectTask) => {
+                            const status = TaskStatus[task.status as keyof typeof TaskStatus]; // Get the text representation of the status.
+                            const color = statusColors[task.status as keyof typeof statusColors]; // Determine the color based on the task's status.
 
-            {/*                return (*/}
-            {/*                    <TableRow*/}
-            {/*                        key={task.id}*/}
-            {/*                        sx={{'&:last-child td, &:last-child th': {border: 0}}}*/}
-            {/*                    >*/}
-            {/*                        <TableCell component="th" scope="row">*/}
-            {/*                            {task.name}*/}
-            {/*                        </TableCell>*/}
-            {/*                        <TableCell>*/}
-            {/*                            {task.storyPoint}*/}
-            {/*                        </TableCell>*/}
-            {/*                        <TableCell style={{backgroundColor: color}}>*/}
-            {/*                            {status}*/}
-            {/*                        </TableCell>*/}
-            {/*                    </TableRow>*/}
-            {/*                );*/}
-            {/*            })}*/}
-            {/*        </TableBody>*/}
-            {/*    </Table>*/}
-            {/*</TableContainer>*/}
-            <div>
-                <TableContainer component={Paper}>
-                    <Table sx={{minWidth: 650}} aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Task Name</TableCell>
-                                <TableCell>Story Points</TableCell>
-                                <TableCell>Status</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {projectTasks?.map((task: ProjectTask) => {
-                                const status = TaskStatus[task.status as keyof typeof TaskStatus]; // Get the text representation of the status.
-                                const color = statusColors[task.status as keyof typeof statusColors]; // Determine the color based on the task's status.
-
-                                return (
-                                    <TableRow
-                                        key={task.id}
-                                        sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                    >
-                                        <TableCell component="th" scope="row">
-                                            {task.name}
-                                        </TableCell>
-                                        <TableCell>
-                                            {task.storyPoint}
-                                        </TableCell>
-                                        <TableCell style={{backgroundColor: color}}>
-                                            {status}
-                                        </TableCell>
-                                        <TableCell>
-                                            <IconButton color="primary" onClick={() => handleTaskClick(task)}>
-                                                <VisibilityIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                        <TableCell>
-                                            <IconButton color="secondary" onClick={() => handleRowClick(task)}>
-                                                <EditIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                            return (
+                                <TableRow
+                                    key={task.id}
+                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    onClick={() => handleTaskClick(task)}
+                                >
+                                    <TableCell component="th" scope="row">
+                                        {task.name}
+                                    </TableCell>
+                                    <TableCell>
+                                        {task.storyPoint}
+                                    </TableCell>
+                                    <TableCell style={{backgroundColor: color}}>
+                                        {status}
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
                 {/* Conditionally render the UpdateForm if a task is selected */}
                 {selectedTask && (
