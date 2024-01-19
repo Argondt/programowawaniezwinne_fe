@@ -1,9 +1,16 @@
 import React, {useState} from 'react';
-import {useMutation, useQueryClient} from 'react-query';
-import {Drawer, Box, Button, TextField, Paper} from '@mui/material';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
+import {Drawer, Box, Button, TextField, Paper, FormControlLabel, Checkbox} from '@mui/material';
 import AddIcon from "@mui/icons-material/Add";
 import {apiService} from "../../Services/ApiService";
 import {CreateTaskDrawerFormProps, TaskData, TaskDataCreate} from "../Interface/TaskData";
+import {User} from "../users/User";
+
+interface UserDto {
+    id: number;
+    name: string; // Ensure this exists
+    // ... other properties
+}
 
 const CreateTaskDrawerForm: React.FC<CreateTaskDrawerFormProps> = ({projectId, onTaskAdded}) => {
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -11,25 +18,40 @@ const CreateTaskDrawerForm: React.FC<CreateTaskDrawerFormProps> = ({projectId, o
     const [taskDescription, setTaskDescription] = useState('');
     const [taskOrder, setTaskOrder] = useState('');
     const queryClient = useQueryClient();
+    const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+    const {data: users, isLoading, isError} = useQuery<User[], Error>('users', apiService.getUsers);
+    const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
+    const handleCheckboxChange = (userId: string, checked: boolean) => {
+        if (checked) {
+            setSelectedUserId(userId);
+        } else if (selectedUserId === userId) {
+            setSelectedUserId(null);
+        }
+    };
     const createTaskMutation = useMutation(
-        (taskData: TaskDataCreate) => apiService.createTask(taskData),
+        (taskData: TaskDataCreate) => apiService.createTask({
+            ...taskData,
+            userIds: selectedUserIds
+        }),
         {
             onSuccess: () => {
-                onTaskAdded(); // Wywołanie callbacku po pomyślnym dodaniu zadania
+                onTaskAdded();
                 setDrawerOpen(false);
             }
         }
     );
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        createTaskMutation.mutate({
-            nazwa: taskName,
-            opis: taskDescription,
-            kolejnosc: Number(taskOrder),
-            projektId: projectId
-        });
+        if (selectedUserId) {
+            createTaskMutation.mutate({
+                nazwa: taskName,
+                opis: taskDescription,
+                kolejnosc: Number(taskOrder),
+                projektId: projectId,
+                userId: selectedUserId
+            });
+        }
     };
 
     return (
@@ -67,6 +89,25 @@ const CreateTaskDrawerForm: React.FC<CreateTaskDrawerFormProps> = ({projectId, o
                                 onChange={(e) => setTaskOrder(e.target.value)}
                                 required
                             />
+                            {/* Displaying users with checkboxes */}
+                            {isLoading ? (
+                                <div>Loading users...</div>
+                            ) : isError ? (
+                                <div>Error loading users</div>
+                            ) : (
+                                users?.map(user => (
+                                    <FormControlLabel
+                                        key={user.id}
+                                        control={
+                                            <Checkbox
+                                                checked={user.id === selectedUserId}
+                                                onChange={(e) => handleCheckboxChange(user.id, e.target.checked)}
+                                            />
+                                        }
+                                        label={`${user.firstName} ${user.lastName}`}
+                                    />
+                                ))
+                            )}
                             <Button type="submit" variant="contained" color="primary">
                                 Utwórz zadanie
                             </Button>

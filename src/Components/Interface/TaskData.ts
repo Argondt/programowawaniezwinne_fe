@@ -5,11 +5,13 @@ export interface TaskData {
     kolejnosc: number;
     projektId: string; // or number, depending on your project structure
 }
+
 export interface TaskDataCreate {
     nazwa: string;
     opis: string;
     kolejnosc: number;
-    projektId: string; // or number, depending on your project structure
+    projektId: string;
+    userId: string;
 }
 
 export interface TaskDataUpdate {

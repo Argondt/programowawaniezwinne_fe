@@ -7,4 +7,5 @@ export interface ProjectTask {
     storyPoint: number;
     description: string;
     endDate: string;
+    userId: any;
 }

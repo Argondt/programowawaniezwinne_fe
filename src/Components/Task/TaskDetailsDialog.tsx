@@ -147,7 +147,7 @@ const TaskDetailsDialog: React.FC<TaskDetailsProps> = ({task, open, onClose}) =>
                         <Typography variant="caption" color="textSecondary">Przypisane do</Typography>
                         <Typography sx={{display: 'flex', alignItems: 'center', mt: 0.5}}>
                             <PersonIcon fontSize="small" sx={{mr: 1}}/>
-                            {task?.name}
+                            {task?.userId}
                         </Typography>
                     </Grid>
                     <Divider variant="middle" sx={{width: '100%', my: 2}}/>

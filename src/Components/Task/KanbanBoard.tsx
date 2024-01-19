@@ -22,7 +22,7 @@ import {
     Box,
     Button,
     Drawer,
-    Grid ,
+    Grid,
     IconButton
 } from '@mui/material';
 import AddIcon from "@mui/icons-material/Add";
@@ -209,18 +209,18 @@ const KanbanBoard = () => {
 
     return (
         <Container>
-            <Box style={{padding: "20px", display: "flex", justifyContent: "flex-end", marginBottom: "20px"}}>
-                <Button variant="outlined" startIcon={<AddIcon/>} onClick={() => setDrawerOpen(true)}>
+            <Box style={{ padding: "20px", display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}>
+                <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setDrawerOpen(true)}>
                     Dodaj Pliki
                 </Button>
-                <CreateTaskDrawerForm projectId={id} onTaskAdded={handleTaskAdded}/>
+                <CreateTaskDrawerForm projectId={id} onTaskAdded={handleTaskAdded} />
             </Box>
 
             <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-                <Box sx={{width: 250, padding: 3}}>
+                <Box sx={{ width: 250, padding: 3 }}>
                     <Typography variant="h6">Wgraj pliki</Typography>
-                    <input type="file" multiple onChange={handleFileChange} style={{display: "none"}} id="file-input"/>
-                    <label htmlFor="file-input" style={{width: "100%"}}>
+                    <input type="file" multiple onChange={handleFileChange} style={{ display: "none" }} id="file-input" />
+                    <label htmlFor="file-input" style={{ width: "100%" }}>
                         <Box sx={{
                             border: '2px dashed grey',
                             padding: 5,
@@ -238,7 +238,6 @@ const KanbanBoard = () => {
                 </Box>
             </Drawer>
 
-
             <TaskDetailsDialog
                 task={selectedTask}
                 open={isDetailsOpen}
@@ -248,8 +247,9 @@ const KanbanBoard = () => {
             <Typography variant="h6">
                 Suma Story Points: {totalStoryPoints} | Ukończono: {completedStoryPoints}
             </Typography>
+
             <TableContainer component={Paper}>
-                <Table sx={{minWidth: 650}} aria-label="simple table">
+                <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
                             <TableCell>Nazwa zadania</TableCell>
@@ -259,14 +259,13 @@ const KanbanBoard = () => {
                     </TableHead>
                     <TableBody>
                         {projectTasks?.map((task: ProjectTask) => {
-                            const status = TaskStatus[task.status as keyof typeof TaskStatus]; // Get the text representation of the status.
-                            const color = statusColors[task.status as keyof typeof statusColors]; // Determine the color based on the task's status.
-
+                            const status = TaskStatus[task.status as keyof typeof TaskStatus];
+                            const color = statusColors[task.status as keyof typeof statusColors];
+                            console.log(task);
                             return (
                                 <TableRow
                                     key={task.id}
-                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                    onClick={() => handleTaskClick(task)}
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">
                                         {task.name}
@@ -274,8 +273,18 @@ const KanbanBoard = () => {
                                     <TableCell>
                                         {task.storyPoint}
                                     </TableCell>
-                                    <TableCell style={{backgroundColor: color}}>
+                                    <TableCell style={{ backgroundColor: color }}>
                                         {status}
+                                    </TableCell>
+                                    <TableCell>
+                                        <IconButton color="primary" onClick={() => handleTaskClick(task)}>
+                                            <VisibilityIcon />
+                                        </IconButton>
+                                    </TableCell>
+                                    <TableCell>
+                                        <IconButton color="secondary" onClick={() => handleRowClick(task)}>
+                                            <EditIcon />
+                                        </IconButton>
                                     </TableCell>
                                 </TableRow>
                             );
@@ -284,34 +293,33 @@ const KanbanBoard = () => {
                 </Table>
             </TableContainer>
 
-                {/* Conditionally render the UpdateForm if a task is selected */}
-                {selectedTask && (
-                    <UpdateForm open={isUpdateFormOpen} onClose={handleCloseForm} task={selectedTask}/>
-                )}
-            </div>
+            {selectedTask && (
+                <UpdateForm open={isUpdateFormOpen} onClose={handleCloseForm} task={selectedTask} />
+            )}
 
-            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3}}>
-                <Typography variant="h5" sx={{padding: "16px"}}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+                <Typography variant="h5" sx={{ padding: "16px" }}>
                     Pliki projektu:
                 </Typography>
             </Box>
+
             <Grid container spacing={3}>
                 {plikiProjektu && plikiProjektu.length > 0 ? (
                     plikiProjektu.map((plik, index) => (
                         <Grid item xs={12} sm={6} md={4} key={index}>
-                            <Paper elevation={3} style={{padding: "20px", textAlign: "center", cursor: "pointer"}}
+                            <Paper elevation={3} style={{ padding: "20px", textAlign: "center", cursor: "pointer" }}
                                    onClick={() => handleDownload(plik.fileName)}>
-                                <Typography sx={{marginLeft: 2, wordBreak: 'break-all'}}>{plik.fileName}</Typography>
+                                <Typography sx={{ marginLeft: 2, wordBreak: 'break-all' }}>{plik.fileName}</Typography>
                             </Paper>
                         </Grid>
                     ))
                 ) : (
-                    <NoFilesMessage/>
+                    <NoFilesMessage />
                 )}
             </Grid>
-
         </Container>
     );
 };
+
 
 export default KanbanBoard;

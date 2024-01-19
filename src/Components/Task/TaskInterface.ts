@@ -6,7 +6,9 @@ export interface Task {
     status: string;
     description: string;
     endDate: any;
+    userid: string;
 }
+
 export interface TaskUpdate {
     id: string;
     name: string;
@@ -17,7 +19,7 @@ export interface TaskUpdate {
 }
 
 export interface TaskDetailsProps {
-    task: Task  | null;
+    task: ProjectTask | null;
     open: boolean;
     onClose: () => void;
 }
